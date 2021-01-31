@@ -8,7 +8,6 @@ edition = "2018"
 
 [dependencies]
 itertools = "0.10.0"
-ndarray = "0.14.0"
 rayon = "1.5.0"
 arrayvec = "0.5.2"
 num = "0.3.1"
@@ -16,6 +15,13 @@ num-traits = "0.2.14"
 lazy_static = "1.4.0"
 fxhash = "0.2.1"
 bit-set = "0.5.2"
+ndarray-csv = "0.5.0"
+csv = "1.1.5"
+tempus_fugit = "0.11.0"
+
+[dependencies.ndarray]
+version = "0.14.0"
+features = ["rayon"]
 
 [profile.release]
 panic = "abort"

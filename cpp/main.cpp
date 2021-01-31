@@ -65,20 +65,20 @@ int main(int argc, char const *argv[]) {
 	}
 #endif
 
-	int avg = 0;
+	double avg = 0;
 	for (int i = 0; i < BENCH_ITERS; i++) {
 		exampleA = srcMat;
 		exampleB = srcMat;
 		auto start = std::chrono::high_resolution_clock::now();
 
-		// gauss_elim(N, N, exampleA.data(), exampleB.data());
-		ispc::gauss_elim(N, N, exampleA.data(), exampleB.data());
+		gauss_elim(N, N, exampleA.data(), exampleB.data());
+		// ispc::gauss_elim(N, N, exampleA.data(), exampleB.data());
 
 		std::chrono::duration<double> dur = std::chrono::high_resolution_clock::now() - start;
-		std::cout << dur.count() << std::endl;
+		// std::cout << dur.count() << std::endl;
 		avg += ((double)dur.count()) / BENCH_ITERS;
 	}
-	std::cout << avg << std::endl;
+	std::cout  << "avg: "<< avg << std::endl;
 
 	return 0;
 }

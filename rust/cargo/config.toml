@@ -3,7 +3,7 @@ panic = "abort"
 codegen-units = 1
 lto = "fat"
 linker = "rust-lld"
-rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y"]
+rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y", "-C", "target-feature=avx2"]
 
 [profile.dev]
 linker = "rust-lld"
