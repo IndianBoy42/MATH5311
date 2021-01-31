@@ -43,10 +43,11 @@ fn main() {
     gauss_elim(A.view_mut(), B.view_mut());
     dbg!(B);
 
-    let mut A = f().map_err(|x| dbg!(x)).unwrap();
-    let mut B = A.clone();
+    let A = f().map_err(|x| dbg!(x)).unwrap();
 
     for _ in 0..10 {
+        let mut A = A.clone();
+        let mut B = A.clone();
         let (_, time) = tempus_fugit::measure!(gauss_elim(A.view_mut(), B.view_mut()));
         println!("{}", time);
     }
