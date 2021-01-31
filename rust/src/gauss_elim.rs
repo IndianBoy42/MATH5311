@@ -11,33 +11,21 @@ pub fn gauss_elim(mut A: ndarray::ArrayViewMut2<f32>, mut B: ndarray::ArrayViewM
     for k in 0..N {
         let a = A[(k, k)];
         let (mut a_blk, mut a_col, a_row) =
-            // A.multi_slice_mut((s![(k + 1)..N, (k + 1)..N], s![(k + 1)..N, k], s![k, (k + 1)..N]));
-            A.multi_slice_mut((s![(k + 1)..N, (k + 1)..N], s![(k + 1)..N, k..(k+1)], s![k, (k + 1)..N]));
+            A.multi_slice_mut((s![(k + 1)..N, (k + 1)..N], s![(k + 1)..N, k], s![k, (k + 1)..N]));
         let a_row = a_row.view();
-        a_col.div_assign(a);
-        let a_col = a_col.view();
-
-        // ndarray::Zip::from(a_blk)
-        //     .and_broadcast(a_col)
-        //     .and_broadcast(a_row)
-        //     .par_apply(|l, &r, &c| {
-        //         *l -= r * c;
-        //     });
-        par_azip!((lrow in a_blk.genrows_mut(), &r in a_col.column(0)) {
+        
+        par_azip!((lrow in a_blk.genrows_mut(), r in &mut a_col) {
+            *r/=a;
+            let r = *r;
             azip!((l in lrow, &c in a_row) {
                 *l -= r*c;
             })
         });
+        let a_col = a_col.view();
 
         let (bk, mut brest) = B.multi_slice_mut((s![k, 0..M], s![(k + 1)..N, 0..M]));
         let bk = bk.view();
-        // ndarray::Zip::from(brest)
-        //     .and_broadcast(a_col)
-        //     .and_broadcast(bk)
-        //     .par_apply(|l, a, b| {
-        //         *l -= b * a;
-        //     });
-        par_azip!((lhs in brest.genrows_mut(), &a in a_col.column(0))  {
+        par_azip!((lhs in brest.genrows_mut(), &a in a_col)  {
             azip!((lhs in lhs, &b in bk) {
                 *lhs -= b * a;
             })
