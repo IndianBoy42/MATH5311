@@ -1,0 +1,30 @@
+[package]
+name = "math5311_rust"
+version = "0.1.0"
+authors = ["Anshuman <amedhi@connect.ust.hk>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+itertools = "0.10.0"
+ndarray = "0.14.0"
+rayon = "1.5.0"
+arrayvec = "0.5.2"
+num = "0.3.1"
+num-traits = "0.2.14"
+lazy_static = "1.4.0"
+fxhash = "0.2.1"
+bit-set = "0.5.2"
+
+[profile.release]
+panic = "abort"
+# codegen-units = 1
+lto = "fat"
+
+[dev-dependencies]
+criterion = "0.3.4"
+
+[[bench]]
+name = "math"
+harness = false
