@@ -1,6 +1,7 @@
 use std::error::Error;
 use std::fs::File;
 
+use cholesky::cholesky;
 use csv::{ReaderBuilder, WriterBuilder};
 use gauss_elim::{gauss_elim, gauss_elim_rust};
 use math5311_rust::*;
@@ -34,14 +35,23 @@ fn main() {
         // [2., 1., -1.,],
         // [4., 5., -3.,],
         // [-2., 5., -2.,],
-        [3., 5., 7., 2.,],
-        [1., 4., 7., 2.,],
-        [6., 3., 9., 17.,],
-        [13., 5., 4., 16.,],
+        [2., 1., 0.,],
+        [1., 2., 1.,],
+        [0., 1., 2.,],
+        // [3., 5., 7., 2.,],
+        // [1., 4., 7., 2.,],
+        // [6., 3., 9., 17.,],
+        // [13., 5., 4., 16.,],
     ];
     let mut A = src.clone();
     let mut B = A.clone();
-    gauss_elim(A.view_mut(), B.view_mut());
+    cholesky(
+        A.ncols(),
+        B.ncols(),
+        A.as_slice_mut().unwrap(),
+        B.as_slice_mut().unwrap(),
+    );
+    dbg!(A);
     dbg!(B);
 
     let mut A = src.clone();
@@ -56,7 +66,7 @@ fn main() {
 
     let A = f().map_err(|x| dbg!(x)).unwrap();
 
-    for _ in 0..10 {
+    for _ in 0..0 {
         let mut A = A.clone();
         let mut B = A.clone();
         // let A = A.view_mut();
