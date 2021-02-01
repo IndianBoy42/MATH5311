@@ -2,54 +2,6 @@ use ndarray::{azip, par_azip, s, Array, Array1, Axis, IntoNdProducer};
 
 use std::ops::{DivAssign, MulAssign, SubAssign};
 
-pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
-    assert_eq!(A.len(), N * N);
-    assert_eq!(B.len(), N * M);
-    for k in 0..(N - 1) {
-        let akk = A[k * N + k];
-
-        let mut ablk = A[(k * N)..].chunks_exact_mut(N).map(|row| &mut row[k..]);
-
-        let arow = ablk.next().unwrap();
-        let arow = &arow[1..];
-        ablk.for_each(|row| {
-            let (ac, lhs) = row.split_first_mut().unwrap();
-            *ac /= akk;
-            let ac = *ac;
-            lhs.into_iter().zip(arow).for_each(|(a, ar)| {
-                *a -= ac * ar;
-            })
-        });
-
-        let acol = A[((k + 1) * N + k)..].iter().step_by(N);
-        let mut bblk = B[(k * M)..].chunks_exact_mut(M);
-        let bk = bblk.next().unwrap();
-        let bk = bk.as_ref();
-        bblk.zip(acol).for_each(|(bout, &a)| {
-            bout.into_iter().zip(bk).for_each(|(x, b)| {
-                *x -= a * b;
-            })
-        });
-    }
-
-    for k in (0..N).rev() {
-        let akk = A[k * N + k];
-
-        let ak = &A[(k * N + (k + 1))..((k + 1) * N)];
-        let mut bblk = B[(k * N)..].chunks_exact_mut(M);
-        let bk = bblk.next().unwrap();
-        bblk.zip(ak).for_each(|(bk1, a)| {
-            let bk1 = &*bk1;
-            bk.iter_mut().zip(bk1).for_each(|(bout, &bin)| {
-                *bout -= bin * a;
-            })
-        });
-
-        bk.iter_mut().for_each(|x| *x /= akk);
-
-    }
-}
-
 pub fn gauss_elim(mut A: ndarray::ArrayViewMut2<f32>, mut B: ndarray::ArrayViewMut2<f32>) {
     assert_eq!(A.nrows(), B.nrows());
     assert_eq!(A.nrows(), A.ncols());
