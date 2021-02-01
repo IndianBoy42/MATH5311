@@ -1,10 +1,9 @@
 #include "gausselim.hpp"
 
-#include "matrices.hpp"
 
 #define A(I, J) (A_[I * N + J])
 #define B(I, J) (B_[I * M + J])
-export void gauss_elim(uniform int N, uniform int M, uniform float* restrict A_, uniform float* restrict B_) {
+void gauss_elim(int N, int M, float* restrict A_, float* restrict B_) {
 	for (int k = 0; k < N - 1; k++) {
 		for (int i = k + 1; i < N; i++) {
 			A(i, k) /= A(k, k);

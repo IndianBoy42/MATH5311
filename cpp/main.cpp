@@ -75,7 +75,7 @@ int main(int argc, char const *argv[]) {
 		// ispc::gauss_elim(N, N, exampleA.data(), exampleB.data());
 
 		std::chrono::duration<double> dur = std::chrono::high_resolution_clock::now() - start;
-		// std::cout << dur.count() << std::endl;
+		std::cout << dur.count() << std::endl;
 		avg += ((double)dur.count()) / BENCH_ITERS;
 	}
 	std::cout  << "avg: "<< avg << std::endl;

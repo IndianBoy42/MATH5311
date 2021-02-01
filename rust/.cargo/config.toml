@@ -1,0 +1,21 @@
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = "fat"
+linker = "rust-lld"
+rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y", "-C", "target-feature=avx2"]
+
+[profile.dev]
+linker = "rust-lld"
+rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y"]
+
+[profile.test]
+linker = "rust-lld"
+rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y"]
+
+[profile.bench]
+# panic = "abort"
+# codegen-units = 1
+# lto = "thin"
+linker = "rust-lld"
+rustflags = ["-C", "target-cpu=native", "-Z", "share-generics=y"]
