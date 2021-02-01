@@ -1,17 +1,19 @@
 use ndarray::{azip, par_azip, s, Array, Array1, Axis, IntoNdProducer};
-
+use rayon::prelude::*;
 use std::ops::{DivAssign, MulAssign, SubAssign};
 
 pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
     assert_eq!(A.len(), N * N);
+    assert_ne!(N, 0);
+    assert_ne!(M, 0);
     assert_eq!(B.len(), N * M);
     for k in 0..(N - 1) {
         let akk = A[k * N + k];
 
-        let mut ablk = A[(k * N)..].chunks_exact_mut(N).map(|row| &mut row[k..]);
+        let (arow, ablk) = A[(k * N + k + 1)..].split_at_mut(N - k - 1);
+        let arow = arow.as_ref();
+        let ablk = ablk.chunks_exact_mut(N).map(|row| &mut row[k..]);
 
-        let arow = ablk.next().unwrap();
-        let arow = &arow[1..];
         ablk.for_each(|row| {
             let (ac, lhs) = row.split_first_mut().unwrap();
             *ac /= akk;
@@ -22,8 +24,11 @@ pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
         });
 
         let acol = A[((k + 1) * N + k)..].iter().step_by(N);
-        let mut bblk = B[(k * M)..].chunks_exact_mut(M);
-        let bk = bblk.next().unwrap();
+
+        let (bk, bblk) = B[(k * M)..].split_at_mut(M);
+        let bblk = bblk.chunks_exact_mut(M);
+        // let mut bblk = B[(k * M)..].chunks_exact_mut(M);
+        // let bk = bblk.next().unwrap();
         let bk = bk.as_ref();
         bblk.zip(acol).for_each(|(bout, &a)| {
             bout.into_iter().zip(bk).for_each(|(x, b)| {
@@ -32,21 +37,19 @@ pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
         });
     }
 
-    for k in (0..N).rev() {
+    B[N * N - 1] /= A[N * N - 1];
+    for k in (0..(N - 1)).rev() {
         let akk = A[k * N + k];
-
         let ak = &A[(k * N + (k + 1))..((k + 1) * N)];
-        let mut bblk = B[(k * N)..].chunks_exact_mut(M);
-        let bk = bblk.next().unwrap();
-        bblk.zip(ak).for_each(|(bk1, a)| {
-            let bk1 = &*bk1;
+
+        let (bk, bblk) = B[(k * M)..].split_at_mut(M);
+        let bblk = bblk.chunks_exact(M);
+        bblk.zip(ak).for_each(|(bk1, &a)| {
             bk.iter_mut().zip(bk1).for_each(|(bout, &bin)| {
                 *bout -= bin * a;
             })
         });
-
         bk.iter_mut().for_each(|x| *x /= akk);
-
     }
 }
 
