@@ -37,15 +37,19 @@ pub fn gauss_elim(mut A: ndarray::ArrayViewMut2<f32>, mut B: ndarray::ArrayViewM
         let (b_nxt, mut b_row) = B.multi_slice_mut((s![(k + 1).., ..], s![k, ..]));
         let akk = A[(k, k)];
 
-        azip!((bcol in b_nxt.gencolumns(), bk in b_row) {
-            const UNROLL: usize = 32;
-            let ab: f32 = bcol.axis_chunks_iter(Axis(0), UNROLL)
-                .zip(a.axis_chunks_iter(Axis(0), UNROLL))
-                .map(|(a,b)|a.dot(&b)).sum();
-                // .fold(0f32, |acc, (a,b)| acc + a.dot(&b));
-                // .fold(0f32, |acc, (a,b)| acc + (a.to_owned()*b).sum());
-            // let ab = bcol.dot(&a);
+        let c = a.dot(&b_nxt);
+        azip!((bk in b_row, &ab in &c) {
             *bk = (*bk - ab) / akk;
-        })
+        });
+        // azip!((bcol in b_nxt.gencolumns(), bk in b_row) {
+        //     const UNROLL: usize = 32;
+        //     let ab: f32 = bcol.axis_chunks_iter(Axis(0), UNROLL)
+        //         .zip(a.axis_chunks_iter(Axis(0), UNROLL))
+        //         .map(|(a,b)|a.dot(&b)).sum();
+        //         // .fold(0f32, |acc, (a,b)| acc + a.dot(&b));
+        //         // .fold(0f32, |acc, (a,b)| acc + (a.to_owned()*b).sum());
+        //     // let ab = bcol.dot(&a);
+        //     *bk = (*bk - ab) / akk;
+        // });
     }
 }
