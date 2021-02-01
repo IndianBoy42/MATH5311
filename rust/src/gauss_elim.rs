@@ -12,7 +12,7 @@ pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
 
         let (arow, ablk) = A[(k * N + k + 1)..].split_at_mut(N - k - 1);
         let arow = arow.as_ref();
-        let ablk = ablk.chunks_exact_mut(N).map(|row| &mut row[k..]);
+        let ablk = ablk.par_chunks_exact_mut(N).map(|row| &mut row[k..]);
 
         ablk.for_each(|row| {
             let (ac, lhs) = row.split_first_mut().unwrap();
@@ -24,12 +24,12 @@ pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
         });
 
         let acol = A[((k + 1) * N)..]
-            .chunks_exact(N)
+            .par_chunks_exact(N)
             .map(|x| unsafe { x.get_unchecked(k) });
         // let acol = A[((k + 1) * N + k)..].iter().step_by(N);
 
         let (bk, bblk) = B[(k * M)..].split_at_mut(M);
-        let bblk = bblk.chunks_exact_mut(M);
+        let bblk = bblk.par_chunks_exact_mut(M);
         // let mut bblk = B[(k * M)..].chunks_exact_mut(M);
         // let bk = bblk.next().unwrap();
         let bk = bk.as_ref();
