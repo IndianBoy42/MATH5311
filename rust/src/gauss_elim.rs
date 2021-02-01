@@ -23,7 +23,10 @@ pub fn gauss_elim_rust(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
             })
         });
 
-        let acol = A[((k + 1) * N + k)..].iter().step_by(N);
+        let acol = A[((k + 1) * N)..]
+            .chunks_exact(N)
+            .map(|x| unsafe { x.get_unchecked(k) });
+        // let acol = A[((k + 1) * N + k)..].iter().step_by(N);
 
         let (bk, bblk) = B[(k * M)..].split_at_mut(M);
         let bblk = bblk.chunks_exact_mut(M);
