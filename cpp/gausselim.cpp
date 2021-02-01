@@ -1,6 +1,5 @@
 #include "gausselim.hpp"
 
-
 #define A(I, J) (A_[I * N + J])
 #define B(I, J) (B_[I * M + J])
 void gauss_elim(int N, int M, float* restrict A_, float* restrict B_) {
@@ -23,7 +22,7 @@ void gauss_elim(int N, int M, float* restrict A_, float* restrict B_) {
 	}
 
 	for (int k = N - 1; k >= 0; k--) {
-		for (int j = N - 1; j >= k + 1; j--) {
+		for (int j = k + 1; j < N; j++) {
 			for (int i = 0; i < M; i++) {
 				B(k, i) -= A(k, j) * B(j, i);
 			}

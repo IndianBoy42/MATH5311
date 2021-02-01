@@ -33,6 +33,8 @@
 
 # CMake Build Directory
 build
+gbuild
+cbuild
 
 # VSCode Directory
 .vscode
