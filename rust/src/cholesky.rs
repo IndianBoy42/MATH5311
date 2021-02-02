@@ -17,7 +17,7 @@ pub fn cholesky(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
         let ajj = *ajj;
 
         ajp.chunks_exact_mut(N)
-            .map(|row| &mut row[..(j+1)])
+            .map(|row| &mut row[..(j + 1)])
             .map(|row| row.split_last_mut().unwrap())
             .for_each(|(out, &mut ref ai)| {
                 let c: f32 = aj.iter().zip(ai).map(|(&i, &j)| i * j).sum();
@@ -30,6 +30,7 @@ pub fn cholesky(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
         // let acol = A[((j + 1) * N + j)..].iter().step_by(N);
 
         let (bj, bblk) = B[(j * M)..].split_at_mut(M);
+        bj.iter_mut().for_each(|x| *x /= ajj);
         let bblk = bblk.chunks_exact_mut(M);
         let bj = bj.as_ref();
         bblk.zip(acol).for_each(|(bout, &a)| {
@@ -38,10 +39,11 @@ pub fn cholesky(N: usize, M: usize, A: &mut [f32], B: &mut [f32]) {
             })
         });
     }
+
     B[N * N - 1] /= A[N * N - 1];
     for k in (0..(N - 1)).rev() {
         let akk = A[k * N + k];
-        let ak = A[(k * N)..]
+        let ak = A[((k + 1) * N)..]
             .chunks_exact(N)
             .map(|x| unsafe { x.get_unchecked(k) });
 
